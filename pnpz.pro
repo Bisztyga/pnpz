@@ -18,3 +18,8 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
+
+unix:!macx: LIBS += -L$$PWD/../../../../usr/lib/vmware-vix-disklib/lib64/ -lvixDiskLib
+
+INCLUDEPATH += $$PWD/../../../../usr/lib/vmware-vix-disklib/include
+DEPENDPATH += $$PWD/../../../../usr/lib/vmware-vix-disklib/include
