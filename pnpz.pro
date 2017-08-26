@@ -13,8 +13,10 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    asyncinotify.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    asyncinotify.h
 
 FORMS    += mainwindow.ui
