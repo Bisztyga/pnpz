@@ -18,19 +18,33 @@
 #define DIRECTORY_RENAMED_FROM 12
 #define DIRECTORY_RENAMED_TO 13
 
-struct rememberPath{
-  int watchDescriptor;
-  char *directory;
-  int fileDescriptor;
-};
+
 
 class AsyncInotify : public QThread
 {
-  static char *contatenate( char *_str1, char *_str2, int _lengthResult);
-  static char *getFullPath(int _wdID, char* _fileName);
+    struct rememberPath{
+      int watchDescriptor;
+      char* directory;
+      int fileDescriptor;
+    };
+ rememberPath* listOfPaths;
+
+  //It is used to get full directory of changed file
+  //User needs to provide ID of "listOfPaths" member and name of changed file
+  char *contatenate( char *_str1, char *_str2, int _lengthResult);
+
+  //Contatenates 2 strings. It takes care of allocking memory for new pointer
+  //and keeps strings in arguments untouched
+  char *getFullPath(int _wdID, char* _fileName);
+  //Called only at program start, read all directories and sets watches;
+  void initializeDirectories(char* mainPath);
+  //Adds first element of list and dump object indicated its end
+  void startList(char* mainPath);
+  void addSimpleDirectory(char* _directory);
+  void listenForEvent();
   Q_OBJECT
 public:
-  explicit AsyncInotify(QObject *parent = 0);
+  explicit AsyncInotify(char* mainDir, QObject *parent = 0);
   ~AsyncInotify();
   void run();
 signals:

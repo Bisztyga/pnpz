@@ -6,17 +6,13 @@ MainWindow::MainWindow(QWidget *parent) :
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
-  AsyncInotify *asyncInotify = new AsyncInotify;
+  AsyncInotify *asyncInotify = new AsyncInotify("/home/bisztyga/Desktop/aaa");
   asyncInotify->setObjectName("my thread");
   asyncInotify->start();
   connect( asyncInotify,
            SIGNAL(inotify(char*,int,char*)),
            this,
            SLOT(InotifyReceived(char*,int,char*)));
- // connect( asyncInotify,
-   //        SIGNAL(inotify(char*,int)),
-     //      this,
-       //    SLOT(InotifyReceived(char*,int)));
 }
 
 MainWindow::~MainWindow()
