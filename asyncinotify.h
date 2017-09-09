@@ -25,7 +25,6 @@ class AsyncInotify : public QThread
     struct rememberPath{
       int watchDescriptor;
       char* directory;
-      int fileDescriptor;
     };
  rememberPath* listOfPaths;
 
@@ -41,7 +40,13 @@ class AsyncInotify : public QThread
   //Adds first element of list and dump object indicated its end
   void startList(char* mainPath);
   void addSimpleDirectory(char* _directory);
+  //Removes watch directory. Object of struct isn't
+  //
+  void removeDirectory(int _wd);
   void listenForEvent();
+  int getListSize();
+  int getProperIndex(int _wd);
+  int fileDescriptor;
   Q_OBJECT
 public:
   explicit AsyncInotify(char* mainDir, QObject *parent = 0);

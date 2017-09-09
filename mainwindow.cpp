@@ -24,6 +24,6 @@ MainWindow::~MainWindow()
 
 void MainWindow::InotifyReceived(char *fullDirectory, int action, char *secondDirectory)
 {
-  qDebug()<<"EMITED!!";
-  printf("File :\"%s\" has changed.\n", fullDirectory);
+  //qDebug()<<"EMITED!!";
+  //printf("File :\"%s\" has changed.\n", fullDirectory);
 }
