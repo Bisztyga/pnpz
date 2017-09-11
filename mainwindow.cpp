@@ -6,13 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
   ui(new Ui::MainWindow)
 {
   ui->setupUi(this);
-  AsyncInotify *asyncInotify = new AsyncInotify("/home/bisztyga/Desktop/aaa");
-  asyncInotify->setObjectName("my thread");
-  asyncInotify->start();
-  connect( asyncInotify,
-           SIGNAL(inotify(char*,int,char*)),
-           this,
-           SLOT(InotifyReceived(char*,int,char*)));
+
 }
 
 MainWindow::~MainWindow()
@@ -22,8 +16,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::InotifyReceived(char *fullDirectory, int action, char *secondDirectory)
+
+void MainWindow::on_pushButton_clicked()
 {
-  //qDebug()<<"EMITED!!";
-  //printf("File :\"%s\" has changed.\n", fullDirectory);
+    char* text = (char*) malloc(sizeof(char) * (ui->lineEdit->text().size() + 1));
+    strcpy(text, ui->lineEdit->text().toStdString().c_str());
+
+    GetIdBox* idBox = new GetIdBox(text, this);
+    idBox->show();
+    this->hide();
 }
+
+
+

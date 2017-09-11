@@ -7,7 +7,7 @@
 #include <sys/inotify.h>
 #include <iostream>
 #include <unistd.h>
-
+#include <common.h>
 
 #define FILE_CREATED 0
 #define FILE_DELETED 1
@@ -28,12 +28,10 @@ class AsyncInotify : public QThread
     };
  rememberPath* listOfPaths;
 
+
+
   //It is used to get full directory of changed file
   //User needs to provide ID of "listOfPaths" member and name of changed file
-  char *contatenate( char *_str1, char *_str2, int _lengthResult);
-
-  //Contatenates 2 strings. It takes care of allocking memory for new pointer
-  //and keeps strings in arguments untouched
   char *getFullPath(int _wdID, char* _fileName);
   //Called only at program start, read all directories and sets watches;
   void initializeDirectories(char* mainPath);
@@ -53,7 +51,7 @@ public:
   ~AsyncInotify();
   void run();
 signals:
-  void inotify(char *fullDirectory, int action, char *secondDirectory = NULL );
+  void inotify(char *fullDirectory, int action );
 public slots:
 };
 

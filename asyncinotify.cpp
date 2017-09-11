@@ -4,23 +4,7 @@
 #define EVENT_SIZE  ( sizeof (struct inotify_event) )
 #define BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 
-char *AsyncInotify::contatenate(char *_str1, char *_str2 , int _lengthResult)
-{
-  char *_fullPath = ( char* ) malloc( _lengthResult + 1 );
-  if (NULL==_fullPath) printf("malloc failed");
-  _fullPath[_lengthResult]='\0';
-  char *_usingPointer=_str1;
-  int counter = 0;
-  for (int i=0; i<_lengthResult; i++) {
-    if (NULL == _usingPointer[counter]) {
-      _usingPointer=_str2;
-      counter=0;
-    }
-    _fullPath[i]=_usingPointer[counter];
-    counter++;
-  }
-  return _fullPath;
-}
+
 
 char *AsyncInotify::getFullPath( int _wd, char *_fileName)
 {
@@ -31,9 +15,9 @@ char *AsyncInotify::getFullPath( int _wd, char *_fileName)
   char *_fullPath;
   char *_helpingPath;
   _sizeOfDir++;
-  _helpingPath = contatenate(listOfPaths[index].directory, "/", _sizeOfDir);
+  _helpingPath = Common::contatenate(listOfPaths[index].directory, "/", _sizeOfDir);
   _sizeOfDir +=_sizeOfName;
-  _fullPath = contatenate(_helpingPath, _fileName, _sizeOfDir );
+  _fullPath = Common::contatenate(_helpingPath, _fileName, _sizeOfDir );
   delete _helpingPath;
   return _fullPath;
 }

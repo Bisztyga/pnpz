@@ -2,8 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "asyncinotify.h"
 #include <stdio.h>
+#include <getidbox.h>
 namespace Ui {
 class MainWindow;
 }
@@ -17,8 +17,12 @@ public:
   ~MainWindow();
   AsyncInotify *asyncInotify;
 
-public slots:
-    void InotifyReceived(char *fullDirectory, int action, char *secondDirectory = NULL );
+
+private slots:
+    void on_pushButton_clicked();
+
+
+
 private:
   Ui::MainWindow *ui;
 };
