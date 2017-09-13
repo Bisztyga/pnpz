@@ -22,14 +22,11 @@
 
 class AsyncInotify : public QThread
 {
-    struct rememberPath{
-      int watchDescriptor;
-      char* directory;
-    };
- rememberPath* listOfPaths;
-
-
-
+  struct rememberPath{
+    int watchDescriptor;
+    char* directory;
+  };
+  rememberPath* listOfPaths;
   //It is used to get full directory of changed file
   //User needs to provide ID of "listOfPaths" member and name of changed file
   char *getFullPath(int _wdID, char* _fileName);

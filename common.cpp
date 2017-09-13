@@ -6,9 +6,7 @@ int Common::getSize(const char *dir)
   DIR* direntDirectory = opendir(dir);
   int counter = 0;
   if (!(NULL == direntDirectory)) {
-    while (direntStruct = readdir(direntDirectory)) {
-      if ('.' != direntStruct->d_name[0]) counter++;
-      }
+    while (direntStruct = readdir(direntDirectory)) if ('.' != direntStruct->d_name[0]) counter++;
   }
   return counter;
 }
@@ -48,7 +46,6 @@ int Common::lookForFiles(const char *dir, char **&dirList)
 {
   int size = getSize(dir);
   dirList = (char**) malloc(sizeof(char*) * size);
-
   struct dirent* direntStruct;
   DIR* direntDirectory = opendir(dir);
   int counter = 0;

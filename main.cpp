@@ -11,11 +11,10 @@ int main(int argc, char *argv[])
 {
   char** test;
   int k=Common::lookForFiles("/home/bisztyga/", test);
-
   for (int i=0; i<k ; i++)
   {
-      qDebug()<<test[i];
-}
+    qDebug()<<test[i];
+  }
   QApplication a(argc, argv);
   MainWindow w;
   w.show();

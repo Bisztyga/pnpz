@@ -1,36 +1,37 @@
 #include "summary.h"
 #include "ui_summary.h"
 #include "QDebug"
-Summary::Summary(char* id, char* mountPath, QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::Summary)
+Summary::Summary(char* id, char* mountPath, QWidget *parent) : QDialog(parent), ui(new Ui::Summary)
 {
-    AsyncInotify *asyncInotify = new AsyncInotify(mountPath);
-    asyncInotify->setObjectName("my thread");
-    asyncInotify->start();
-    connect( asyncInotify,
-             SIGNAL(inotify(char*,int)),
-             this,
-             SLOT(InotifyReceived(char*,int)));
-
-    userId=id;
-    ui->setupUi(this);
-    QString data=id;
-    ui->label->setText(data);
-    this->mountPath=mountPath;
-    refresh();
+  AsyncInotify *asyncInotify = new AsyncInotify(mountPath);
+  asyncInotify->setObjectName("my thread");
+  asyncInotify->start();
+  connect( asyncInotify,
+           SIGNAL(inotify(char*,int)),
+           this,
+           SLOT(InotifyReceived(char*,int)));
+  userId=id;
+  ui->setupUi(this);
+  QString data=id;
+  ui->label->setText(data);
+  this->mountPath=mountPath;
+  refresh();
 }
 
 void Summary::InotifyReceived(char *fullDirectory, int action)
 {
-  qDebug()<<"inotify";
-  refresh();
-  //printf("File :\"%s\" has changed.\n", fullDirectory);
+  qDebug()<<"intoify received";
+  if (FILE_CREATED == action) {
+    qDebug()<<"File created";
+    readFile(fullDirectory);
+    updateGUI();
+  }
+  else refresh();
 }
 
 Summary::~Summary()
 {
-    delete ui;
+  delete ui;
 }
 
 void Summary::refresh()
@@ -61,16 +62,9 @@ void Summary::refresh()
     free(folder);
     free(listOfFiles);
   }
-  for (int i = 0; i<numberOfFolders; i++) {
-    free(listOfFolders[i]);
-  }
+  for (int i = 0; i<numberOfFolders; i++) free(listOfFolders[i]);
   free(listOfFolders);
-  QString pos = QString::number(positive);
-  ui->label_6->setText(pos);
-  QString neg = QString::number(negative);
-  ui->label_7->setText(neg);
-  QString diff = QString::number(positive - negative);
-  ui->label_8->setText(diff);
+  updateGUI();
 }
 
 void Summary::readFile(const char *dir)
@@ -94,4 +88,21 @@ void Summary::readFile(const char *dir)
   }
   free(line);
   fclose(stream);
- }
+}
+
+void Summary::updateGUI()
+{
+  QString pos = QString::number(positive);
+  ui->label_6->setText(pos);
+  QString neg = QString::number(negative);
+  ui->label_7->setText(neg);
+  QString diff = QString::number(positive - negative);
+  ui->label_8->setText(diff);
+
+}
+
+void Summary::on_pushButton_2_clicked()
+{
+  Events* events = new Events(mountPath, this);
+  events->show();
+}

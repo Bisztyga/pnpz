@@ -10,11 +10,9 @@ class GetEvent;
 class GetEvent : public QDialog
 {
     Q_OBJECT
-
 public:
-    explicit GetEvent(QWidget *parent = 0);
-    ~GetEvent();
-
+  explicit GetEvent(QWidget *parent = 0);
+  ~GetEvent();
 private:
     Ui::GetEvent *ui;
 };

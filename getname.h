@@ -9,14 +9,12 @@ class GetName;
 
 class GetName : public QDialog
 {
-    Q_OBJECT
-
+  Q_OBJECT
 public:
-    explicit GetName(QWidget *parent = 0);
-    ~GetName();
-
+  explicit GetName(QWidget *parent = 0);
+  ~GetName();
 private:
-    Ui::GetName *ui;
+  Ui::GetName *ui;
 };
 
 #endif // GETNAME_H

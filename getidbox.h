@@ -10,16 +10,14 @@ class GetIdBox;
 
 class GetIdBox : public QDialog
 {
-    Q_OBJECT
-
+  Q_OBJECT
 public:
-    explicit GetIdBox(char* mountPath, QWidget *parent = 0);
-    ~GetIdBox();
-
+  explicit GetIdBox(char* mountPath, QWidget *parent = 0);
+  ~GetIdBox();
 private slots:
-    void on_pushButton_clicked();
-
-    void on_pushButton_2_clicked();
+  void on_pushButton_clicked();
+  void on_pushButton_2_clicked();
+  void on_lineEdit_editingFinished();
 
 private:
     Ui::GetIdBox *ui;

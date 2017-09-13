@@ -12,20 +12,37 @@ char *AsyncInotify::getFullPath( int _wd, char *_fileName)
   int _sizeOfDir;
   int _sizeOfName=strlen( _fileName );
   _sizeOfDir=strlen(listOfPaths[index].directory );
-  char *_fullPath;
-  char *_helpingPath;
-  _sizeOfDir++;
-  _helpingPath = Common::contatenate(listOfPaths[index].directory, "/", _sizeOfDir);
+  char* _fullPath;
+  char* _helpingPath;
+  qDebug()<<"1";
+  if ('/' == listOfPaths[index].directory[_sizeOfDir]) {
+    _sizeOfDir++;
+    _helpingPath = Common::contatenate(listOfPaths[index].directory, "/", _sizeOfDir);
+  }
+
+  qDebug()<<"2";
+  _helpingPath = (char*) malloc(sizeof(char*) * _sizeOfDir + 1);
+  strcpy(_helpingPath, listOfPaths[index].directory);
   _sizeOfDir +=_sizeOfName;
+
+  qDebug()<<"3";
   _fullPath = Common::contatenate(_helpingPath, _fileName, _sizeOfDir );
   delete _helpingPath;
+  qDebug()<<"Full path is"<<_fullPath;
   return _fullPath;
 }
 
 void AsyncInotify::initializeDirectories(char *mainPath)
 {
   startList(mainPath);
-  //addSimpleDirectory();
+  char** listOfFolders;
+  int numberOfFolders = Common::lookForFiles(mainPath, listOfFolders);
+  for (int i=0; i<numberOfFolders; i++) {
+    qDebug()<<"I've found file:"<<listOfFolders[i];
+    char* properFolder = Common::contatenate(mainPath, listOfFolders[i], Common::getLenght(listOfFolders[i]) + Common::getLenght(mainPath));
+    addSimpleDirectory(properFolder);
+    free (properFolder);
+  }
 }
 
 void AsyncInotify::startList(char *mainPath)
@@ -65,39 +82,40 @@ void AsyncInotify::removeDirectory(int _wd)
 
 void AsyncInotify::listenForEvent()
 {
-    int length, i;
-    char buffer[BUF_LEN];
-    char *_path;
-    int mainDirectory = 0;
-    while(1) {
-      length = read( fileDescriptor, buffer, BUF_LEN );
-      if ( length < 0 ) {
-        perror( "read" );
-      }
-      i = 0;
-      while ( i < length ) {
-        struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
-        if (event->len) {
-          if (listOfPaths[0].watchDescriptor == event->wd) mainDirectory = 1;
-          else mainDirectory = 0;
-          _path=getFullPath( event->wd, event->name );
-          if ( event->mask & IN_CREATE ) {
-            if ( (event->mask & IN_ISDIR) && 1 == mainDirectory) {
-              emit inotify( _path, DIRECTORY_CREATED );
-              addSimpleDirectory(_path);
-              printf( "The directory %s was created.\n", _path );
-            } else if ( !(event->mask & IN_ISDIR) && 0 == mainDirectory){
-              emit inotify( _path, FILE_CREATED );
-              printf( "The file %s was created.\n", _path );
-            }
-          } else if ( (event->mask & IN_DELETE) && !(event->mask & IN_ISDIR) && 0 == mainDirectory ) {
-              emit inotify( _path, FILE_DELETED );
-              printf( "The directory %s was deleted.\n", _path );
-          }
-        }
-        i += EVENT_SIZE + event->len;
-      }
+  int length, i;
+  char buffer[BUF_LEN];
+  char *_path;
+  int mainDirectory = 0;
+  while(1) {
+    length = read( fileDescriptor, buffer, BUF_LEN );
+    if ( length < 0 ) {
+      perror( "read" );
     }
+    i = 0;
+    while ( i < length ) {
+      struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
+      if (event->len) {
+        if (listOfPaths[0].watchDescriptor == event->wd) mainDirectory = 1;
+        else mainDirectory = 0;
+        _path=getFullPath( event->wd, event->name );
+        if ( event->mask & IN_CREATE ) {
+          if ( (event->mask & IN_ISDIR) && 1 == mainDirectory) {
+            qDebug()<<"Inot: dir"<<_path<<"has been created";
+            emit inotify( _path, DIRECTORY_CREATED );
+            addSimpleDirectory(_path);
+            printf( "The directory %s was created.\n", _path );
+          } else if ( !(event->mask & IN_ISDIR) && 0 == mainDirectory){
+            emit inotify( _path, FILE_CREATED );
+            printf( "The file %s was created.\n", _path );
+          }
+        } else if ( (event->mask & IN_DELETE) && !(event->mask & IN_ISDIR) && 0 == mainDirectory ) {
+            emit inotify( _path, FILE_DELETED );
+            printf( "The directory %s was deleted.\n", _path );
+        }
+      }
+      i += EVENT_SIZE + event->len;
+    }
+  }
 }
 int AsyncInotify::getListSize()
 {
@@ -112,15 +130,15 @@ int AsyncInotify::getListSize()
 }
 int AsyncInotify::getProperIndex(int _wd)
 {
-    int dumpObjectIndex = getListSize();
-    int i = 0;
-    while (true){
-      if (dumpObjectIndex == i){
-        return -1;
-      }
-      if (_wd == listOfPaths[i].watchDescriptor) return i;
-      i++;
+  int dumpObjectIndex = getListSize();
+  int i = 0;
+  while (true){
+    if (dumpObjectIndex == i){
+      return -1;
     }
+    if (_wd == listOfPaths[i].watchDescriptor) return i;
+    i++;
+  }
 }
 AsyncInotify::AsyncInotify(char *mainDir, QObject *parent) : QThread(parent)
 {
@@ -132,8 +150,8 @@ void AsyncInotify::run() {
 }
 AsyncInotify::~AsyncInotify()
 {
-    qDebug()<<"destructor";
-    //TODO DESTRUCTOR
+  //TODO DESTRUCTOR
+  //Not urgent since it is called only when app is shutting down - allocated memory is freed anyway;
   inotify_rm_watch( fileDescriptor, listOfPaths[0].watchDescriptor );
   QThread::wait(1500);
   qDebug()<<"destructor1";
